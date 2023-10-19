@@ -18,8 +18,35 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
   justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.background {
+  background-color: #282c34;
+  min-height: 300vh;
+}
+.foreground {
+  background-color: #282c34;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.statement {
+  background-color: #282c34;
+  align-items: right;
+  top: 100px;
+  left: 300px;
+  position: absolute;
+  white-space: normal;
+    /* This allows text to wrap normally */
+  word-wrap: break-word;
   font-size: calc(10px + 2vmin);
   color: white;
 }
