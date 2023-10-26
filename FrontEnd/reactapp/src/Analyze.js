@@ -5,6 +5,9 @@ import Button from '@mui/material/Button';
 import DescriptionIcon from '@mui/icons-material/Description';
 import FileContentDisplay from './FileContentDisplay';
 import { useState } from 'react';
+import { usePromiseTracker } from "react-promise-tracker";
+import { trackPromise } from 'react-promise-tracker';
+import { TailSpin } from "react-loader-spinner";
 
 
 function Analyze() {
@@ -15,6 +18,16 @@ function Analyze() {
         hiddenFileInput.current.click();
     };
 
+
+    const LoadingIndicator = props => {
+        const { promiseInProgress } = usePromiseTracker();
+        return (
+            promiseInProgress && 
+            <div>
+                <TailSpin color="green" radius={"2px"}/>
+            </div >
+            );
+         }
 
     const showFile = async (e) => {
         e.preventDefault()
@@ -29,6 +42,7 @@ function Analyze() {
     }
 
     function sendData(text) {
+        trackPromise(
         axios({
             method: "POST",
             url: "/QandA",
@@ -50,7 +64,7 @@ function Analyze() {
                     console.log(error.response.status)
                     console.log(error.response.headers)
                 }
-            })
+            }));
     }
      
     return (
@@ -58,6 +72,9 @@ function Analyze() {
             <header className="App-header">
                 
                 <Button onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Add New Statement</Button>
+                <div className='center'>
+                <LoadingIndicator />
+                </div>
                 <FileContentDisplay content={fileContent}/>
                 <input
                     type="file"
