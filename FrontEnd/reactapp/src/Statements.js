@@ -8,7 +8,8 @@ import { FixedSizeList } from 'react-window';
 import FileContentDisplay from './FileContentDisplay';
 import DescriptionIcon from '@mui/icons-material/Description';
 import statement1 from './witnessstatements/statement1.txt'
-
+const texts = require.context('./witnessstatements', true);
+const textsList = texts.keys().map(text => texts(text));
 
 function Statements() {
     const [fileContent, setFileContent] = useState('');
@@ -27,6 +28,7 @@ function Statements() {
     }
 
     function showStatement(index) {
+        alert(textsList[0]);
         fetch(statement1)
             .then(r => r.text())
             .then(text => {

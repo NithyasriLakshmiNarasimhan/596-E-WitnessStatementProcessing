@@ -43,6 +43,7 @@
   align-items: right;
   top: 100px;
   left: 300px;
+  width: 500px;
   position: absolute;
   white-space: normal;
     /* This allows text to wrap normally */

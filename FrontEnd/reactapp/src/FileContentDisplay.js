@@ -4,16 +4,13 @@ import './App.css'
 function FileContentDisplay({ content }) {
     return (
         
-        <div className='background'>     
-           <div className='statement'>
+        <div>
             {content ? (
                 <pre>{content}</pre>
             ) : (
                 <p></p>
             )}
         </div>
-        </div>
-
     );
 }
 

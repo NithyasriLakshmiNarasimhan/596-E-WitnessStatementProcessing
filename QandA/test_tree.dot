@@ -1,0 +1,32 @@
+digraph tree {
+	"Kidnapping" [label="Kidnapping", shape=circle]
+	"crime_vehicle" [label="crime_vehicle", shape=circle]
+	"crime_vehicle_number" [label="crime_vehicle_number", shape=circle]
+	"criminal appearance" [label="criminal appearance", shape=circle]
+	"criminal_desc" [label="criminal_desc", shape=circle]
+	"criminal_gender" [label="criminal_gender", shape=circle]
+	"victim gender" [label="victim gender", shape=circle]
+	"victim_age" [label="victim_age", shape=circle]
+	"A white van" [label="A white van", shape=circle]
+	"abc-1234" [label="abc-1234", shape=circle]
+	"A gray sweatshirt and jeans" [label="A gray sweatshirt and jeans", shape=circle]
+	"A teenager" [label="A teenager", shape=circle]
+	"female" [label="female", shape=circle]
+	"Female" [label="Female", shape=circle]
+	"20 years old" [label="20 years old", shape=circle]
+
+	"Kidnapping" -> "victim_age"
+	"Kidnapping" -> "victim gender"
+	"Kidnapping" -> "criminal appearance"
+	"Kidnapping" -> "criminal_desc"
+	"Kidnapping" -> "crime_vehicle_number"
+	"Kidnapping" -> "crime_vehicle"
+	"Kidnapping" -> "criminal_gender"
+	"crime_vehicle" -> "A white van"
+	"crime_vehicle_number" -> "abc-1234"
+	"criminal appearance" -> "A gray sweatshirt and jeans"
+	"criminal_desc" -> "A teenager"
+	"criminal_gender" -> "female"
+	"victim gender" -> "Female"
+	"victim_age" -> "20 years old"
+}
