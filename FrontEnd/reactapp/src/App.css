@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #172249;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,9 +23,15 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+p {
+  white-space: pre-wrap;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-top: 20%;
+}
 
 .background {
-  background-color: #282c34;
+  background-color: #6e7686;
   min-height: 300vh;
 }
 .foreground {
@@ -38,6 +44,18 @@
   color: white;
 }
 
+
+.upload {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(195, 20, 20);
+}
+.whiteBack{
+  background-color: #d7dbe2;
+}
 .statement {
   background-color: #282c34;
   align-items: right;

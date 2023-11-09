@@ -1,19 +1,22 @@
-import './App.css';
+import './Statements.css';
 import { useRef } from 'react';         
 import axios from "axios";
 import Button from '@mui/material/Button';
 import DescriptionIcon from '@mui/icons-material/Description';
-import FileContentDisplay from './FileContentDisplay';
 import { useState } from 'react';
 import { usePromiseTracker } from "react-promise-tracker";
 import { trackPromise } from 'react-promise-tracker';
 import { TailSpin } from "react-loader-spinner";
+import TextField from '@mui/material/TextField';
 
-
+// this is Q AND A
 function Analyze() {
     const hiddenFileInput = useRef(null);
     const [fileContent, setFileContent] = useState('');
+    const [statement, setStatement] = useState('');
 
+    const [newQList, setnewQList] = useState([]);
+    const [newQ, setNewQ] = useState('');
     const handleClick = event => {
         hiddenFileInput.current.click();
     };
@@ -40,6 +43,16 @@ function Analyze() {
         };
         reader.readAsText(e.target.files[0]);
     }
+    const checkEnter = (e) =>{
+        if(e.key === 'Enter'){
+            setnewQList(newQList => [...newQList, newQ]);
+            setNewQ("");
+            // alert(newQ);
+        }
+    }
+    const handleText = (e) =>{
+        setNewQ(e.target.value);
+    }
 
     function sendData(text) {
         trackPromise(
@@ -47,6 +60,7 @@ function Analyze() {
             method: "POST",
             url: "/QandA",
             data: {
+                questions: newQList,
                 statement: text
             }
         })
@@ -54,6 +68,7 @@ function Analyze() {
                 const res = response.data
                 // alert(res);
                 setFileContent(res);
+                setStatement(text);
                 // setProfileData(({
                 //     profile_name: res.name,
                 //     about_me: res.about
@@ -68,14 +83,39 @@ function Analyze() {
     }
      
     return (
+        
         <div className="Analyze">
-            <header className="App-header">
                 
-                <Button onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Add New Statement</Button>
+                <Button style={{
+                    borderRadius: 35,
+                    backgroundColor: "#21b6ae",
+                    padding: "10px 12px",
+                    fontSize: "16px",
+                    width: "20%",
+                    position: "absolute",
+                    left: "40%",
+                    top: "20%"
+                }}
+                    variant="contained" onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Upload A Statement For Q and A</Button>
+            
+            <TextField style={{
+                backgroundColor: "#21b6ae",
+                fontSize: "16px",
+                width: "20%",
+                position: "absolute",
+                left: "40%",
+                top: "32%",
+                color:"white"
+            }} label="Additional Questions" value = {newQ} variant="filled" focused onChange={(e) => handleText(e)} onKeyDown={checkEnter} />
+            
+            <header className="App-header">
                 <div className='center'>
                 <LoadingIndicator />
                 </div>
-                <FileContentDisplay content={fileContent}/>
+                <p>{fileContent}
+                    <br></br><br></br>Your Witness Statement:<br></br><br></br>
+                    {statement}</p>
+
                 <input
                     type="file"
                     onChange={(e) => showFile(e)}
