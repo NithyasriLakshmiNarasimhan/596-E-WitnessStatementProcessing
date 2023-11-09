@@ -173,6 +173,7 @@ def doNer():
   output = ""
   for k,v in d.items():
     output += k +": "
+    v = set(v)
     for name in v:
       output += name + ", "
     output += "\n"
