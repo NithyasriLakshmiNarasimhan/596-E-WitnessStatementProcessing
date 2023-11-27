@@ -8,9 +8,9 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
 import GrainIcon from '@mui/icons-material/Grain';
 import DescriptionIcon from '@mui/icons-material/Description';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Home from "./Home"
 
 export default function MyToolBar() {
@@ -36,9 +36,9 @@ export default function MyToolBar() {
             <AppBar position="static">
                 <Toolbar>
                     <Button color="inherit" onClick={navigateHome}><HomeIcon></HomeIcon>Home</Button>
-                    <Button color="inherit" onClick={navigateToAnalyze}><SearchIcon></SearchIcon>Q and A</Button>
+                    <Button color="inherit" onClick={navigateToAnalyze}><UploadFileIcon></UploadFileIcon>Upload Statement</Button>
                     <Button color="inherit" onClick={navigateToClusters}><GrainIcon></GrainIcon>Clusters</Button>
-                    <Button color="inherit" onClick={navigateToStatements}><DescriptionIcon></DescriptionIcon>N E R</Button>
+                    <Button color="inherit" onClick={navigateToStatements}><DescriptionIcon></DescriptionIcon>Case Files</Button>
                 </Toolbar>
             </AppBar>
             <Routes>

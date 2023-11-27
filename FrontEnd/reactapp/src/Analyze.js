@@ -1,5 +1,5 @@
 import './Statements.css';
-import { useRef } from 'react';         
+import { useRef } from 'react';
 import axios from "axios";
 import Button from '@mui/material/Button';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -8,29 +8,31 @@ import { usePromiseTracker } from "react-promise-tracker";
 import { trackPromise } from 'react-promise-tracker';
 import { TailSpin } from "react-loader-spinner";
 import TextField from '@mui/material/TextField';
+import SearchIcon from '@mui/icons-material/Search';
 
-// this is Q AND A
 function Analyze() {
     const hiddenFileInput = useRef(null);
-    const [fileContent, setFileContent] = useState('');
+    const [QandAResponse, setQandAResponse] = useState('');
+    const [NERResponse, setNERResponse] = useState('');
     const [statement, setStatement] = useState('');
-
+    const [newQs, setNewQs] = useState('');
     const [newQList, setnewQList] = useState([]);
     const [newQ, setNewQ] = useState('');
+    const [currStatement, setCurrStatement] = useState('');
+    const [fileName, setFileName] = useState('');
     const handleClick = event => {
         hiddenFileInput.current.click();
     };
 
-
     const LoadingIndicator = props => {
         const { promiseInProgress } = usePromiseTracker();
         return (
-            promiseInProgress && 
+            promiseInProgress &&
             <div>
-                <TailSpin color="green" radius={"2px"}/>
+                <TailSpin color="green" radius={"2px"} />
             </div >
-            );
-         }
+        );
+    }
 
     const showFile = async (e) => {
         e.preventDefault()
@@ -38,66 +40,87 @@ function Analyze() {
         reader.onload = async (e) => {
             const text = (e.target.result)
             console.log(text);
-            // alert(text);
-            sendData(text)
+            setCurrStatement(text);
         };
         reader.readAsText(e.target.files[0]);
+        setFileName("Uploaded File: " + e.target.files[0].name)
     }
-    const checkEnter = (e) =>{
-        if(e.key === 'Enter'){
+    const checkEnter = (e) => {
+        if (e.key === 'Enter') {
             setnewQList(newQList => [...newQList, newQ]);
+            setNewQs(newQs + "\n" + newQ);
             setNewQ("");
-            // alert(newQ);
         }
     }
-    const handleText = (e) =>{
+    const handleText = (e) => {
         setNewQ(e.target.value);
     }
-
-    function sendData(text) {
-        trackPromise(
-        axios({
-            method: "POST",
-            url: "/QandA",
-            data: {
-                questions: newQList,
-                statement: text
-            }
-        })
-            .then((response) => {
-                const res = response.data
-                // alert(res);
-                setFileContent(res);
-                setStatement(text);
-                // setProfileData(({
-                //     profile_name: res.name,
-                //     about_me: res.about
-                // }))
-            }).catch((error) => {
-                if (error.response) {
-                    console.log(error.response)
-                    console.log(error.response.status)
-                    console.log(error.response.headers)
-                }
-            }));
+    function sendData() {
+        sendQandA();
+        sendNER();
     }
-     
+    function sendNER() {
+        trackPromise(
+            axios({
+                method: "POST",
+                url: "/NER",
+                data: {
+                    statement: currStatement
+                }
+            })
+                .then((response) => {
+                    const res = response.data
+                    setNERResponse("NER:\n" + res);
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                }));
+    }
+
+
+    function sendQandA() {
+        trackPromise(
+            axios({
+                method: "POST",
+                url: "/QandA",
+                data: {
+                    questions: newQList,
+                    statement: currStatement
+                }
+            })
+                .then((response) => {
+                    const res = response.data
+                    setQandAResponse("Questions and answers:\n" + res);
+                    setStatement("Witness Statement:\n" + currStatement);
+
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                }));
+    }
+
     return (
-        
+
         <div className="Analyze">
-                
-                <Button style={{
-                    borderRadius: 35,
-                    backgroundColor: "#21b6ae",
-                    padding: "10px 12px",
-                    fontSize: "16px",
-                    width: "20%",
-                    position: "absolute",
-                    left: "40%",
-                    top: "20%"
-                }}
-                    variant="contained" onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Upload A Statement For Q and A</Button>
-            
+
+            <Button style={{
+                borderRadius: 35,
+                backgroundColor: "#21b6ae",
+                padding: "10px 12px",
+                fontSize: "16px",
+                width: "20%",
+                position: "absolute",
+                left: "40%",
+                top: "20%"
+            }}
+                variant="contained" onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Upload New Statement</Button>
+
             <TextField style={{
                 backgroundColor: "#21b6ae",
                 fontSize: "16px",
@@ -105,16 +128,34 @@ function Analyze() {
                 position: "absolute",
                 left: "40%",
                 top: "32%",
-                color:"white"
-            }} label="Additional Questions" value = {newQ} variant="filled" focused onChange={(e) => handleText(e)} onKeyDown={checkEnter} />
-            
+                color: "white"
+            }} label="Additional Questions:" value={newQ} variant="filled" focused onChange={(e) => handleText(e)} onKeyDown={checkEnter} />
+            <Button style={{
+                borderRadius: 35,
+                backgroundColor: "#21b6ae",
+                padding: "10px 12px",
+                fontSize: "16px",
+                width: "20%",
+                position: "absolute",
+                left: "40%",
+                top: "45%"
+            }}
+                variant="contained" onClick={sendData}><SearchIcon fontSize='large'></SearchIcon> Analyze Statement</Button>
             <header className="App-header">
                 <div className='center'>
-                <LoadingIndicator />
+                    <LoadingIndicator />
                 </div>
-                <p>{fileContent}
-                    <br></br><br></br>Your Witness Statement:<br></br><br></br>
-                    {statement}</p>
+                <p>
+                    {fileName}<br></br>
+                    Your Questions:
+                    {newQs}<br></br><br></br>
+                    {QandAResponse}
+                    <br></br>
+                    {NERResponse}
+                    <br></br>
+                    <br></br>
+                    {statement}
+                    </p>
 
                 <input
                     type="file"

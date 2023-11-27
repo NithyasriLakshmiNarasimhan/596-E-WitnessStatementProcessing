@@ -1,23 +1,23 @@
 import './Statements.css';
-import { useRef } from 'react';
-import axios from "axios";
-import Button from '@mui/material/Button';
-import DescriptionIcon from '@mui/icons-material/Description';
-import { useState } from 'react';
 import { usePromiseTracker } from "react-promise-tracker";
-import { trackPromise } from 'react-promise-tracker';
 import { TailSpin } from "react-loader-spinner";
+// import CaseList from './CaseList'
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import FolderIcon from '@mui/icons-material/Folder';
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import { useState, useEffect } from 'react';
+import axios from "axios";
 
-// this is N E R 
+import { trackPromise } from 'react-promise-tracker';
+
 function Statements() {
-    const hiddenFileInput = useRef(null);
     const [fileContent, setFileContent] = useState('');
-    const [statement, setStatement] = useState('');
-
-    const handleClick = event => {
-        hiddenFileInput.current.click();
-    };
-
+    const [fileNames, setFileNames] = useState([]);
+    const [currPath, setCurrPath] = useState([]);
 
     const LoadingIndicator = props => {
         const { promiseInProgress } = usePromiseTracker();
@@ -28,37 +28,44 @@ function Statements() {
             </div >
         );
     }
-
-    const showFile = async (e) => {
-        e.preventDefault()
-        const reader = new FileReader()
-        reader.onload = async (e) => {
-            const text = (e.target.result)
-            console.log(text);
-            // alert(text);
-            sendData(text)
-        };
-        reader.readAsText(e.target.files[0]);
-    }
-
-    function sendData(text) {
+    useEffect(() => {
         trackPromise(
             axios({
                 method: "POST",
-                url: "/NER",
-                data: {
-                    statement: text
-                }
+                url: "/getFiles",
+                data: { fileNum: "File 1" }
             })
                 .then((response) => {
                     const res = response.data
                     // alert(res);
-                    setFileContent(res);
-                    setStatement(text);
-                    // setProfileData(({
-                    //     profile_name: res.name,
-                    //     about_me: res.about
-                    // }))
+                    setFileNames(res);
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                }));
+    }, []);
+    const moveUp = (event) => {
+        if (currPath.length === 0) {
+            return;
+        }
+        let filePath = "";
+        let newPath = [...currPath];
+        newPath.pop()
+        newPath.forEach((e) => filePath += (e + "/"));
+        setCurrPath(newPath)
+        trackPromise(
+            axios({
+                method: "POST",
+                url: "/getFileContent",
+                data: { fileNum: filePath }
+            })
+                .then((response) => {
+                    const res = response.data
+                    // alert(res);
+                    setFileNames(res[0])
                 }).catch((error) => {
                     if (error.response) {
                         console.log(error.response)
@@ -67,38 +74,73 @@ function Statements() {
                     }
                 }));
     }
+    const handleListItemClick = (event, index) => {
+        // hideList();
+        let filePath = "";
+        currPath.forEach((e) => filePath += (e + "/"));
+        filePath += index;
+        let newPath = [...currPath];
+        setCurrPath(newPath)
+        trackPromise(
+            axios({
+                method: "POST",
+                url: "/getFileContent",
+                data: { fileNum: filePath }
+            })
+                .then((response) => {
+                    const res = response.data
+                    // alert(res);
+                    if(res[1] !== ""){
+                    setFileContent(res[1]);}
+                    if (res[0].length !== 0) {
+                        setFileNames(res[0])
+                        newPath.push(index)
+                    }
+                }).catch((error) => {
+                    if (error.response) {
+                        console.log(error.response)
+                        console.log(error.response.status)
+                        console.log(error.response.headers)
+                    }
+                }));
+    };
 
     return (
-        <div className="Analyze">
-            <Button style={{
-                borderRadius: 35,
-                backgroundColor: "#21b6ae",
-                padding: "6px 12px",
-                fontSize: "16px",
-                width: "20%",
-                position: "absolute",
-                left: "40%",
-                top: "20%"
+        <header className="App-header">
+            <Box id='fileList' sx={{ width: '20%', bgcolor: 'primary.list' }} style={{ position: 'absolute', top: '10%' }}>
+                <List component="nav" aria-label="main mailbox folders">
+                    <ListItemButton
+                        onClick={(event) => moveUp(event)}
+                    >
+                        <ListItemIcon>
+                            <DriveFolderUploadIcon style={{ fill: "white" }} />
+                        </ListItemIcon>
+                        {/* <ListItemText primary={currPath[currPath.length-1]+":"} /> */}
+                    </ListItemButton>
+                    {fileNames.map(e => {
+                        return (
+                            <ListItemButton
+                                onClick={(event) => handleListItemClick(event, e)}
+                            >
+                                <ListItemIcon>
+                                    <FolderIcon style={{ fill: "white" }} />
+                                </ListItemIcon>
+                                <ListItemText primary={e} />
+                            </ListItemButton>);
+                    })}
+                </List>
+            </Box>
 
-            }}
-                variant="contained" onClick={handleClick}><DescriptionIcon fontSize='large'></DescriptionIcon> Upload A Statement For NER</Button>
-            <header className="App-header">
-                <div className='center'>
-                    <LoadingIndicator />
+            <p>
+                <div style={{ position: 'relative', left: '20%', right: '10%', width: '70%', top: '-200px' }}>
+                    {fileContent}
                 </div>
-                <p>{fileContent}
-                <br></br><br></br>Your Witness Statement:<br></br><br></br>
-                    {statement}</p>
-                <input
-                    type="file"
-                    onChange={(e) => showFile(e)}
-                    ref={hiddenFileInput}
-                    style={{ display: 'none' }}
-                />
-            </header>
-        </div>
+            </p>
+            <div className='center'>
+                <LoadingIndicator />
+            </div>
+        </header>
     );
 }
-
 export default Statements;
 

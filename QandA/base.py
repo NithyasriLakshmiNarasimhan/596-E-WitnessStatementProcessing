@@ -2,6 +2,7 @@ from transformers  import  AutoTokenizer, AutoModelWithLMHead
 from transformers import AutoModelForTokenClassification
 from transformers import pipeline
 import json
+import os
 model_name = "MaRiOrOsSi/t5-base-finetuned-question-answering"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelWithLMHead.from_pretrained(model_name)
@@ -10,7 +11,34 @@ from flask import request
 import spacy
 api = Flask(__name__)
 import tensorflow as tf
-print(tf.__version__)
+
+
+@api.route('/getFiles', methods = ['GET', 'POST', 'DELETE'])
+def getCaseFiles():
+  statements = json.loads(request.data.decode())
+  context = statements['fileNum']
+  statementsPath = "./Statements"
+  fileString = ""
+  for fileName in os.listdir(statementsPath):
+    fileString += fileName + '\n'
+  return os.listdir(statementsPath)
+
+
+@api.route('/getFileContent', methods = ['GET', 'POST', 'DELETE'])
+def getFileContent():
+  statements = json.loads(request.data.decode())
+  fileNum = statements['fileNum']
+  filePath = "./Statements/" + fileNum
+  returnList = [[], ""]
+  if(os.path.isdir(filePath)):
+    returnList[0] = os.listdir(filePath)
+  if(os.path.isfile(filePath)):
+    fileString = os.path.basename(filePath) + '\n' + '\n'
+    file=open(filePath,"r")
+    fileString += file.read()
+    returnList[1] = fileString
+  return returnList
+
 @api.route('/QandA', methods = ['GET', 'POST', 'DELETE'])
 def my_QandA():
 
@@ -45,7 +73,6 @@ def my_QandA():
 
 @api.route('/NER', methods = ['GET', 'POST', 'DELETE'])
 def doNer():
-  print("we got here instead")
   statements = json.loads(request.data.decode())
   statement = statements['statement']
   # import usaddress

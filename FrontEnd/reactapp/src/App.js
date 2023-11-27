@@ -8,6 +8,7 @@ export default function App() {
       mode: 'light',
       primary: {
         main: '#334192',
+        list: '#062554'
       },
       secondary: {
         main: '#f50057',
