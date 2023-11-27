@@ -1,7 +1,6 @@
 
 
 To run the Flask side:
-Restart the terminal after having done the previous step.
 Navigate to \596-E-WitnessStatementProcessing\QandA
 run the command 'flask run'
 
