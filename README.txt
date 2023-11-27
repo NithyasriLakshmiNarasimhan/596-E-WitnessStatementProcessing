@@ -1,8 +1,4 @@
-To Select Python Environment: 
 
-in Visual Studio press ctrl + shift + p
-choose: Python: Select Interpreter 
-select the .venv in this project location.
 
 To run the Flask side:
 Restart the terminal after having done the previous step.
