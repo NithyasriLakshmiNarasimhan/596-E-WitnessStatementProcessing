@@ -1,0 +1,37 @@
+import './App.css'
+import React, { useState } from 'react';
+
+function TextProcessor() {
+  const [text, setText] = useState('');
+  const [response, setResponse] = useState('');
+
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/process_text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      setResponse(data.message);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  return (
+    <div>
+      <input 
+        type="text" 
+        value={text} 
+        onChange={(e) => setText(e.target.value)} 
+      />
+      <button onClick={handleSubmit}>Submit</button>
+      <p>Response: {response}</p>
+    </div>
+  );
+}
+
+export default TextProcessor;

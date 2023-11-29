@@ -4,7 +4,7 @@ function Home() {
             <header className="App-header">
 
                 <div>
-                    Key Phrase Identification and Statement Clustering for FBI Witness Statements.
+                    Analysis of Witness Statements for FBI investigations
                 </div>
             </header>
 

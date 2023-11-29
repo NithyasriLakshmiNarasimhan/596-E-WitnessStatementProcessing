@@ -23,14 +23,29 @@ def compute_usage(response):
         json.dump(data, f)
 
     
+from openai import OpenAI
+
 def get_openai_response(user_prompt, system_prompt):
-    openai.api_key = "x"
-    response = openai.ChatCompletion.create(
-                  model="gpt-3.5-turbo",
-                  messages=[{"role": "system", "content": system_prompt},
-                            {"role": "user", "content": user_prompt}
-                  ])
-    compute_usage(response)
+    client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key="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",
+)
+
+    response = client.chat.completions.create(
+    messages=[
+        {
+            "role": "system",
+            "content": system_prompt
+        },
+              
+        {
+            "role": "user",
+            "content": user_prompt
+        }
+    ],
+    model="gpt-3.5-turbo",
+)
+    # compute_usage(response)
     return (response)
 
 system_prompt = """
@@ -57,24 +72,6 @@ If the answer to that question is not in the passage, leave it empty:
 
 """
 
-user_prompt = [
-"""
-Statement 1:
-My name is Amanda Clark. I manage a motel just off the highway. A few weeks ago, I noticed a room had been booked for over a month under one man's name. However, I saw a different man coming and going from the room with three young women. They rarely ventured out and looked very scared and thin. I thought it seemed suspicious and called the police to report possible trafficking. Officers investigated and found the women had been kidnapped and were being forced into sex work against their will. I'm glad I spoke up before the situation got worse.
-
-Statement 2:
-My name is Officer James Wilson. I helped raid a motel room where three trafficking victims were being held captive. The young women were lured from vulnerable backgrounds with promises of jobs and security, then transported across state lines and forced into prostitution. The traffickers employed coercion, abuse and controlled their access to food, shelter and medical care. We arrested the ringleaders and provided support services to help the victims. Sadly this is just one example of human trafficking networks exploiting the vulnerable.
-
-Statement 3:
-My name is Amanda Lopez. I thought I had met a nice man online who cared about me. But he convinced me to travel far from home, took my phone, and forced me to have sex with strangers for money. There were two other girls in the same situation who were always under watch. When we didn't obey, we were beaten and starved. They said if we tried to escape our families would pay. I felt totally trapped and scared until the police raided and rescued us. I'm so thankful but the trauma still haunts me.
-
-Statement 4:
-My name is Dr. Sarah Mills. I volunteer with an organization providing medical services to human trafficking survivors. The victims we see have extensive trauma from prolonged abuse - physical injuries, malnutrition, PTSD and more. Restoring their health and trust is extremely difficult. Traffickers often deny them healthcare, control them with forced drug use, and leave victims with long-term medical issues. Sadly there are many still suffering in abusive situations with no access to help. We must keep fighting this criminal exploitation.
-
-Statement 5:
-My name is Mark Caruso. I'm a social worker that assists human trafficking victims after they escape or are rescued. The psychological impact cannot be overstated. Most deal with severe depression, anxiety, substance abuse and suicidal thoughts from the cruelty inflicted upon them. I help connect survivors to counseling, medical care, housing services and vocational training so they can heal and build a better life. It's a long difficult journey but incredibly rewarding to see their strength and resilience.
-""" 
-]
 keys = ['crime', 'criminal gender', 'crime vehicle', 'criminal\'s appearance', 'criminal\'s clothes', 'criminal accessasory', 'crinimal\'s ethnicity', 'criminal\'s age', 'victim\'s appearance', 'victim\'s clothes', 'victim\'s ethnicity', 'victim\'s gender', 'victim\'s age']
 
 app = Flask(__name__)

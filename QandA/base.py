@@ -11,6 +11,55 @@ from flask import request
 import spacy
 api = Flask(__name__)
 import tensorflow as tf
+import json
+import openai
+from openai import OpenAI
+
+def compute_usage(response):
+    f = open('usage.json')
+    data = json.load(f)
+    data['input_tokens_used']+=response['usage']["prompt_tokens"]
+    data['output_tokens_used']+=response['usage']['completion_tokens']
+    with open('usage.json', 'w') as f:
+        json.dump(data, f)
+
+    
+# def get_openai_response(user_prompt, system_prompt):
+#     openai.api_key = "x"
+#     response = openai.ChatCompletion.create(
+#                   model="gpt-3.5-turbo",
+#                   messages=[{"role": "system", "content": system_prompt},
+#                             {"role": "user", "content": user_prompt}
+#                   ])
+#     compute_usage(response)
+#     return (response)
+
+def get_openai_response(user_prompt, system_prompt):
+    client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key="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",
+)
+
+    response = client.chat.completions.create(
+    messages=[
+        {
+            "role": "system",
+            "content": system_prompt
+        },
+              
+        {
+            "role": "user",
+            "content": user_prompt
+        }
+    ],
+    model="gpt-3.5-turbo",
+)
+    # compute_usage(response)
+    # print(response)
+    return (response.choices[0].message.content)
+
+
+
 
 
 @api.route('/getFiles', methods = ['GET', 'POST', 'DELETE'])
@@ -22,6 +71,38 @@ def getCaseFiles():
   for fileName in os.listdir(statementsPath):
     fileString += fileName + '\n'
   return os.listdir(statementsPath)
+
+def openAI_QA(context, question):
+  system_prompt = """
+I will be giving you a few witness statements about a crime. Your task is to answer the follow up question in a clear and concise manner. The accuracy of this task is important and so, refrain from answering the questions whose answers are not mentioned in the statement.
+"""
+  user_prompt = "The Witness statements are as follows:\n" + context + "\n\n" + "question: \t" + question
+
+  return get_openai_response(user_prompt, system_prompt)
+
+
+
+@api.route('/process_text', methods=['POST'])
+def process_text():
+
+    dir_name = request.json.get('text')
+    question = request.json.get('question')
+    content = ""
+    path = 'C:/Users/nithy/Documents/GitHub/596-E-WitnessStatementProcessing/FrontEnd/reactapp/src/witnessstatements/'+ dir_name + '/'
+    with os.scandir(path) as dir_contents:
+      for entry in dir_contents:
+        filename = path + entry.name
+        with open(filename) as f:
+            lines = '\n'.join(f.readlines())
+            # print(lines)
+            content+=lines
+            content+='\n'
+    return openAI_QA(content, question)
+    # return content
+    
+    # Process the text_data here and return a response
+    # response = {"message": f"Processed text: {text_data}"}
+    # return str(response)
 
 
 @api.route('/getFileContent', methods = ['GET', 'POST', 'DELETE'])

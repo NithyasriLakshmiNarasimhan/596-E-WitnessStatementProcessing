@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Analyze from "./Analyze"
 import Statements from "./Statements"
-import Clusters from "./Clusters"
+import DynamicQA from "./DynamicQA"
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -21,7 +21,7 @@ export default function MyToolBar() {
     };
 
     const navigateToClusters = () => {
-        navigate('./Clusters');
+        navigate('./DynamicQA');
     };
     const navigateToStatements = () => {
         navigate('./Statements');
@@ -37,13 +37,13 @@ export default function MyToolBar() {
                 <Toolbar>
                     <Button color="inherit" onClick={navigateHome}><HomeIcon></HomeIcon>Home</Button>
                     <Button color="inherit" onClick={navigateToAnalyze}><UploadFileIcon></UploadFileIcon>Upload Statement</Button>
-                    <Button color="inherit" onClick={navigateToClusters}><GrainIcon></GrainIcon>Clusters</Button>
+                    <Button color="inherit" onClick={navigateToClusters}><GrainIcon></GrainIcon>Dynamic Q and A</Button>
                     <Button color="inherit" onClick={navigateToStatements}><DescriptionIcon></DescriptionIcon>Case Files</Button>
                 </Toolbar>
             </AppBar>
             <Routes>
                 <Route path="/Analyze" element={<Analyze />} />
-                <Route path="/Clusters" element={<Clusters />} />
+                <Route path="/DynamicQA" element={<DynamicQA />} />
                 <Route path="/Statements" element={<Statements />} />
                 <Route path="/Home" element={<Home />} />
             </Routes>
