@@ -20,6 +20,9 @@ function Analyze() {
     const [newQ, setNewQ] = useState('');
     const [currStatement, setCurrStatement] = useState('');
     const [fileName, setFileName] = useState('');
+    const [currCaseName, setCurrCaseName] = useState('');
+    const [savedMessage, setSavedMessage] = useState('');
+    const [showCaseName, setShowCaseName] = useState('');
     const handleClick = event => {
         hiddenFileInput.current.click();
     };
@@ -43,20 +46,18 @@ function Analyze() {
             setCurrStatement(text);
         };
         reader.readAsText(e.target.files[0]);
-        setFileName("Uploaded File: " + e.target.files[0].name)
+        setFileName(e.target.files[0].name)
     }
     const checkEnter = (e) => {
         if (e.key === 'Enter') {
-            setnewQList(newQList => [...newQList, newQ]);
-            setNewQs(newQs + "\n" + newQ);
-            setNewQ("");
+            setShowCaseName("Case Name: " + currCaseName)
         }
     }
-    const handleText = (e) => {
-        setNewQ(e.target.value);
+    const handleText = (e) => { 
+        setCurrCaseName(e.target.value);
     }
     function sendData() {
-        sendQandA();
+        // sendQandA();
         sendNER();
     }
     function sendNER() {
@@ -65,12 +66,15 @@ function Analyze() {
                 method: "POST",
                 url: "/NER",
                 data: {
-                    statement: currStatement
+                    statement: currStatement,
+                    caseName: currCaseName,
+                    fileName: fileName
                 }
             })
                 .then((response) => {
                     const res = response.data
-                    setNERResponse("NER:\n" + res);
+                    setNERResponse(res);
+                    setSavedMessage("Saved Analysis to: "+currCaseName);
                 }).catch((error) => {
                     if (error.response) {
                         console.log(error.response)
@@ -129,7 +133,7 @@ function Analyze() {
                 left: "40%",
                 top: "32%",
                 color: "white"
-            }} label="Additional Questions:" value={newQ} variant="filled" focused onChange={(e) => handleText(e)} onKeyDown={checkEnter} />
+            }} label="Case Name:" value={currCaseName} variant="filled" focused onChange={(e) => handleText(e)} onKeyDown={checkEnter} />
             <Button style={{
                 borderRadius: 35,
                 backgroundColor: "#21b6ae",
@@ -147,9 +151,9 @@ function Analyze() {
                 </div>
                 <p>
                     {fileName}<br></br>
-                    Your Questions:
-                    {newQs}<br></br><br></br>
-                    {QandAResponse}
+                    {showCaseName}<br></br>
+                    {savedMessage}
+                    <br></br>
                     <br></br>
                     {NERResponse}
                     <br></br>

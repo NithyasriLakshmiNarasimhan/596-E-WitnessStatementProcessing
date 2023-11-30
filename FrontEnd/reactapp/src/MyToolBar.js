@@ -37,7 +37,7 @@ export default function MyToolBar() {
                 <Toolbar>
                     <Button color="inherit" onClick={navigateHome}><HomeIcon></HomeIcon>Home</Button>
                     <Button color="inherit" onClick={navigateToAnalyze}><UploadFileIcon></UploadFileIcon>Upload Statement</Button>
-                    <Button color="inherit" onClick={navigateToClusters}><GrainIcon></GrainIcon>Clusters</Button>
+                    <Button color="inherit" onClick={navigateToClusters}><GrainIcon></GrainIcon>Q and A</Button>
                     <Button color="inherit" onClick={navigateToStatements}><DescriptionIcon></DescriptionIcon>Case Files</Button>
                 </Toolbar>
             </AppBar>

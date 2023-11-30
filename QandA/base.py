@@ -17,7 +17,7 @@ import tensorflow as tf
 def getCaseFiles():
   statements = json.loads(request.data.decode())
   context = statements['fileNum']
-  statementsPath = "./Statements"
+  statementsPath = "./Cases"
   fileString = ""
   for fileName in os.listdir(statementsPath):
     fileString += fileName + '\n'
@@ -28,12 +28,13 @@ def getCaseFiles():
 def getFileContent():
   statements = json.loads(request.data.decode())
   fileNum = statements['fileNum']
-  filePath = "./Statements/" + fileNum
+  filePath = "./Cases/" + fileNum
   returnList = [[], ""]
   if(os.path.isdir(filePath)):
     returnList[0] = os.listdir(filePath)
   if(os.path.isfile(filePath)):
-    fileString = os.path.basename(filePath) + '\n' + '\n'
+    fileString = ""
+    # fileString = os.path.basename(filePath) + '\n' + '\n'
     file=open(filePath,"r")
     fileString += file.read()
     returnList[1] = fileString
@@ -75,6 +76,9 @@ def my_QandA():
 def doNer():
   statements = json.loads(request.data.decode())
   statement = statements['statement']
+  caseName = statements['caseName']
+  fileName = statements['fileName']
+
   # import usaddress
 
   tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
@@ -197,11 +201,23 @@ def doNer():
     entity_dict.update(date_dict)
     return entity_dict
   d = NER_func(statement)
-  output = ""
+  output = "Named Entity Recognition Results:\n"
+  # NERFile = open("./Cases/" + caseName + "/" + fileName[:-4] + "NER.txt","a")
+  path = "./Cases/"+ caseName
+  exists = os.path.exists(path)
+  if(not exists):
+    os.mkdir(path)
+  statementFile = {}
   for k,v in d.items():
     output += k +": "
+    statementFile[k] = []
     v = set(v)
     for name in v:
+      statementFile[k].append(name)
       output += name + ", "
     output += "\n"
+  statementFile["witness_statement"] = statement
+  NERFile = open(path + "/" + fileName[:-4] + "_Analysis","a")
+  json.dump(statementFile, NERFile)
+  NERFile.close()
   return output
