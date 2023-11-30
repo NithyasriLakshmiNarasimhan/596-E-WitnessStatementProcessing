@@ -7,7 +7,7 @@ from openai import OpenAI
 def get_openai_response(user_prompt, system_prompt):
     client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key="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",
+    api_key="x",
 )
 
     response = client.chat.completions.create(

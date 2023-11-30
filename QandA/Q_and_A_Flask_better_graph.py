@@ -28,7 +28,7 @@ from openai import OpenAI
 def get_openai_response(user_prompt, system_prompt):
     client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key="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",
+    api_key="x",
 )
 
     response = client.chat.completions.create(
@@ -48,31 +48,6 @@ def get_openai_response(user_prompt, system_prompt):
     # compute_usage(response)
     return (response)
 
-system_prompt = """
-I will be giving you a few witness statements about a crime. Your task is to answer the follow up questions in a clear and concise manner. The accuracy of this task is important and so, refrain from answering the questions whose answers are not mentioned in the statement.
-
-These are the questions that you must answer based on the witness statements. Please limit your answer to 3 words or less.
-
-What was the crime being discussed?
-What is the gender of the criminal?,
-What does the vehicle used in the crime look like?,
-What did the criminal look like?,
-What did the criminal wear?,
-What did the criminal use to commit the crime?,
-What was the criminal's ethnicity?,
-What was the criminal's age?,
-What did the victim look like?,
-What did the victim wear?,
-What was the victim's ethnicity?,
-What was the gender of the victim?,
-What was the age of the victim?
-
-Return the answer as a python list.\\
-If the answer to that question is not in the passage, leave it empty:
-
-"""
-
-keys = ['crime', 'criminal gender', 'crime vehicle', 'criminal\'s appearance', 'criminal\'s clothes', 'criminal accessasory', 'crinimal\'s ethnicity', 'criminal\'s age', 'victim\'s appearance', 'victim\'s clothes', 'victim\'s ethnicity', 'victim\'s gender', 'victim\'s age']
 
 app = Flask(__name__)
 
@@ -80,6 +55,35 @@ app = Flask(__name__)
 # Route for seeing a data
 @app.route('/get_answers')
 def get_answers():
+
+    system_prompt = """
+    I will be giving you a few witness statements about a crime. Your task is to answer the follow up questions in a clear and concise manner. The accuracy of this task is important and so, refrain from answering the questions whose answers are not mentioned in the statement.
+
+    These are the questions that you must answer based on the witness statements. Please limit your answer to 3 words or less.
+
+    What was the crime being discussed?
+    What is the gender of the criminal?,
+    What does the vehicle used in the crime look like?,
+    What did the criminal look like?,
+    What did the criminal wear?,
+    What did the criminal use to commit the crime?,
+    What was the criminal's ethnicity?,
+    What was the criminal's age?,
+    What did the victim look like?,
+    What did the victim wear?,
+    What was the victim's ethnicity?,
+    What was the gender of the victim?,
+    What was the age of the victim?
+
+    Return the answer as a python list.\\
+    If the answer to that question is not in the passage, leave it empty:
+
+    """
+
+    keys = ['crime', 'criminal gender', 'crime vehicle', 'criminal\'s appearance', 'criminal\'s clothes', 'criminal accessasory', 'crinimal\'s ethnicity', 'criminal\'s age', 'victim\'s appearance', 'victim\'s clothes', 'victim\'s ethnicity', 'victim\'s gender', 'victim\'s age']
+
+
+
     user_prompt = request.args.get('user_prompt')
     answers = []
     # for i in range(len(user_prompt)):
