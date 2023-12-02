@@ -54,7 +54,7 @@ def compute_usage(response):
 def get_openai_response(user_prompt, system_prompt):
     client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    # api_key="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",
+    
     api_key = "x"
 )
 
@@ -140,7 +140,6 @@ def getFileContent():
 
 
 @api.route('/StaticGraph', methods = ['GET', 'POST', 'DELETE'])
-@app.route('/get_answers')
 def get_answers():
 
     system_prompt = """
@@ -169,14 +168,28 @@ def get_answers():
 
     keys = ['crime', 'criminal gender', 'crime vehicle', 'criminal\'s appearance', 'criminal\'s clothes', 'criminal accessasory', 'crinimal\'s ethnicity', 'criminal\'s age', 'victim\'s appearance', 'victim\'s clothes', 'victim\'s ethnicity', 'victim\'s gender', 'victim\'s age']
 
+    dir_name = request.json.get('text')
+
+    content=""
+    path = 'C:/Users/nithy/Documents/GitHub/596-E-WitnessStatementProcessing/FrontEnd/reactapp/src/witnessstatements/'+ dir_name + '/'
+    with os.scandir(path) as dir_contents:
+      for entry in dir_contents:
+        filename = path + entry.name
+        with open(filename) as f:
+            lines = '\n'.join(f.readlines())
+            # print(lines)
+            content+=lines
+            content+='\n'
 
 
-    user_prompt = request.args.get('user_prompt')
+    user_prompt = content
     answers = []
     # for i in range(len(user_prompt)):
     response = get_openai_response(user_prompt, system_prompt)
-    answer = ast.literal_eval(response['choices'][0]['message']['content'])
+    print(response)
+    answer = ast.literal_eval(response)
     answers.append(answer)    
+
     description_of_the_crime = {}
     for k, v in zip(keys, answer):
         description_of_the_crime[k]=v
@@ -186,6 +199,7 @@ def get_answers():
     crime_desc = description_of_the_crime['crime']
     nodes.append(crime_desc)
     edges = []
+    colours = ['white']
     for key in description_of_the_crime.keys():
         # edges.append()
 
@@ -195,6 +209,7 @@ def get_answers():
         nodes.append(key)
         
         if len(description_of_the_crime[key])>0 and  "not mentioned" not in str.lower(description_of_the_crime[key]):
+            # colours.append('white')
             nodes.append(description_of_the_crime[key])
             edges.append((key, description_of_the_crime[key]))
         
@@ -203,28 +218,36 @@ def get_answers():
         else:
             edges.append((crime_desc, key))  
 
+        if len(description_of_the_crime[key])<=0 or  "not mentioned" in str.lower(description_of_the_crime[key]):
+           colours.append('red')
+        else:
+          if 'victim' in key:
+            colours.append('blue')
+            colours.append('white')
+          else:
+            colours.append('green')
+            colours.append('white')
+
+
     G = nx.DiGraph()
-
     G.add_nodes_from(nodes)
-
     G.add_edges_from(edges)
 
+    # Create Graphviz digraph for visualization
+    dot = Digraph(comment='Tree Visualization')
 
-    nx.draw(G, with_labels=True, font_weight='bold', node_color='skyblue', edge_color='gray', node_size=800)
-        
-    dot = Graph(comment='Tree Visualization')
+    # Add nodes with colors
+    for node, color in zip(nodes, colours):
+        dot.node(str(node), str(node), color=color, style='filled')
 
-    for node in nodes:
-        dot.node(str(node), str(node))
+    # Add edges (optionally set edge colors)
+    for edge in edges:
+        dot.edge(str(edge[0]), str(edge[1]), color='gray')
 
-    for edge in list(edges):
-        dot.edge(str(edge[0]), str(edge[1]))
-
-    
-    
+    # Generate and return the image
     dot_format = 'png'  # Choose the desired image format (e.g., png, pdf, svg, etc.)
     graph_bytes = dot.pipe(format=dot_format)
-    
+
     graph_bytesio = BytesIO(graph_bytes)
     image = Image.open(graph_bytesio)
     img_stream = BytesIO()
@@ -233,6 +256,36 @@ def get_answers():
 
     # Serve the image to the front end
     return send_file(img_stream, mimetype='image/png')
+    # G = nx.DiGraph()
+
+    # G.add_nodes_from(nodes, color=colours)
+
+    # G.add_edges_from(edges)
+
+
+    # nx.draw(G, with_labels=True, font_weight='bold', node_color=colours, edge_color='gray', node_size=800)
+        
+    # dot = Graph(comment='Tree Visualization')
+
+    # for node in nodes:
+    #     dot.node(str(node), str(node))
+
+    # for edge in list(edges):
+    #     dot.edge(str(edge[0]), str(edge[1]))
+
+    
+    
+    # dot_format = 'png'  # Choose the desired image format (e.g., png, pdf, svg, etc.)
+    # graph_bytes = dot.pipe(format=dot_format)
+    
+    # graph_bytesio = BytesIO(graph_bytes)
+    # image = Image.open(graph_bytesio)
+    # img_stream = BytesIO()
+    # image.save(img_stream, format='PNG')
+    # img_stream.seek(0)
+
+    # # Serve the image to the front end
+    # return send_file(img_stream, mimetype='image/png')
   
 
 
